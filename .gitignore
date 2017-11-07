@@ -15,3 +15,5 @@ lerna-debug.log
 **/index.d.ts
 coverage
 documentation
+yarn-error.log
+
