@@ -1,0 +1,12 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/componentsjs/^3.0.0/components/context.jsonld",
+    {
+      "npmd": "https://linkedsoftwaredependencies.org/bundles/npm/",
+      "cahc": "npmd:@comunica/actor-http-cache/",
+      "files-cahc": "cahc:^1.0.0/",
+
+      "ActorHttpCache": "cahc:Actor/Http/Cache"
+    }
+  ]
+}

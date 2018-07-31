@@ -67,7 +67,9 @@ export class ActorRdfDereferencePagedNext extends ActorRdfDereferencePaged imple
    * @return {Promise<IActorRdfDereferencePagedOutput>} The output.
    */
   protected async runAsync(action: IActionRdfDereferencePaged): Promise<IActorRdfDereferencePagedOutput> {
-    const firstPage: IActorRdfDereferenceOutput = await this.mediatorRdfDereference.mediate(action);
+    const rdfDereferenceAction: IActionRdfDereference = action;
+    rdfDereferenceAction.skipLocalCache = true; // Because we cache on a higher level in this actor.
+    const firstPage: IActorRdfDereferenceOutput = await this.mediatorRdfDereference.mediate(rdfDereferenceAction);
     const firstPageUrl: string = firstPage.pageUrl;
 
     const firstPageMetaSplit: IActorRdfMetadataOutput = await this.mediatorMetadata

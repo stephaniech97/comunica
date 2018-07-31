@@ -30,6 +30,10 @@ export interface IActionRdfDereference extends IAction {
    * The mediatype of the source (if it can't be inferred from the source)
    */
   mediaType?: string;
+  /**
+   * If any local (HTTP) cache should be skipped.
+   */
+  skipLocalCache?: boolean;
 }
 
 export interface IActorRdfDereferenceOutput extends IActorOutput {

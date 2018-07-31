@@ -1,0 +1,44 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-http-cache/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/bus-http/^1.0.0/components/context.jsonld"
+  ],
+  "@id": "npmd:@comunica/actor-http-cache",
+  "components": [
+    {
+      "@id": "cahc:ActionObserver/Http/Cache",
+      "@type": "Class",
+      "extends": "cc:ActionObserver",
+      "requireElement": "ActionObserverHttp",
+      "comment": "A comunica Cache Http ActionObserver.",
+      "parameters": [
+        {
+          "@id": "cc:ActionObserver/bus",
+          "defaultScoped": {
+            "defaultScope": "cahc:ActionObserver/Http/Cache",
+            "defaultScopedValue": { "@id": "cbh:Bus/Http" }
+          }
+        },
+        {
+          "@id": "cahc:ActionObserver/Http/Cache/cacheSize",
+          "comment": "The maximum number of entries in the LRU cache, set to 0 to disable.",
+          "range": "xsd:integer",
+          "default": 100,
+          "required": true,
+          "unique": true
+        }
+      ],
+      "constructorArguments": [
+        {
+          "extends": "cc:ActionObserver/constructorArgumentsObject",
+          "fields": [
+            {
+              "keyRaw": "cacheSize",
+              "value": "cahc:ActionObserver/Http/Cache/cacheSize"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

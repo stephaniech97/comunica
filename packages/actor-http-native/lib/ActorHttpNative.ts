@@ -44,6 +44,11 @@ export class ActorHttpNative extends ActorHttp {
 
     options.method = options.method || 'GET';
 
+    // Remove our internal (non-standardized) cache mode.
+    if (options.cache === 'no-local-cache') {
+      delete options.cache;
+    }
+
     // not all options are supported
 
     return new Promise<IActorHttpOutput>((resolve, reject) => {
@@ -62,16 +67,20 @@ export class ActorHttpNative extends ActorHttp {
           if (httpResponse) {
             // Expose fetch cancel promise
             httpResponse.cancel = () => Promise.resolve(httpResponse.destroy());
-            // missing several of the required fetch fields
-            const result = <IActorHttpOutput> {
-              body: httpResponse,
-              headers: new Headers(httpResponse.headers),
-              ok: httpResponse.statusCode < 300,
-              redirected: options.url !== httpResponse.responseUrl,
-              status: httpResponse.statusCode,
-              url: httpResponse.responseUrl,
-            };
-            resolve(result);
+            resolve(newResult());
+
+            function newResult(): Response {
+              // missing several of the required fetch fields
+              return <Response> {
+                body: httpResponse,
+                clone: newResult,
+                headers: new Headers(httpResponse.headers),
+                ok: httpResponse.statusCode < 300,
+                redirected: options.url !== httpResponse.responseUrl,
+                status: httpResponse.statusCode,
+                url: httpResponse.responseUrl,
+              };
+            }
           }
         });
       });

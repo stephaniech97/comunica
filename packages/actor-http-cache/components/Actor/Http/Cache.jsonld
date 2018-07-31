@@ -1,0 +1,44 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-http-cache/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/bus-http/^1.0.0/components/context.jsonld"
+  ],
+  "@id": "npmd:@comunica/actor-http-cache",
+  "components": [
+    {
+      "@id": "cahc:Actor/Http/Cache",
+      "@type": "Class",
+      "extends": "cbh:Actor/Http",
+      "requireElement": "ActorHttpCache",
+      "comment": "A comunica Cache Http Actor.",
+      "parameters": [
+        {
+          "@id": "cahc:Actor/Http/Cache/httpObserver",
+          "comment": "The HTTP observer that acts as a HTTP cache",
+          "range": "cahc:ActionObserver/Http/Cache",
+          "required": true,
+          "unique": true,
+          "defaultScoped": {
+            "defaultScope": "cahc:Actor/Http/Cache",
+            "defaultScopedValue": {
+              "@id": "cahc:Actor/Http/Cache/httpObserver/default",
+              "@type": "cahc:ActionObserver/Http/Cache"
+            }
+          }
+        }
+      ],
+      "constructorArguments": [
+        {
+          "@id": "cahc:Actor/Http/Cache/constructorArgumentsObject",
+          "extends": "cbh:Actor/Http/constructorArgumentsObject",
+          "fields": [
+            {
+              "keyRaw": "httpObserver",
+              "value": "cahc:Actor/Http/Cache/httpObserver"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

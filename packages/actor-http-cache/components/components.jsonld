@@ -1,0 +1,10 @@
+{
+  "@context": "https://linkedsoftwaredependencies.org/bundles/npm/@comunica/actor-http-cache/^1.0.0/components/context.jsonld",
+  "@id": "npmd:@comunica/actor-http-cache",
+  "@type": "Module",
+  "requireName": "@comunica/actor-http-cache",
+  "import": [
+    "files-cahc:components/ActionObserver/Http/Cache.jsonld",
+    "files-cahc:components/Actor/Http/Cache.jsonld"
+  ]
+}

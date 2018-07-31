@@ -42,6 +42,10 @@ export class ActorRdfDereferenceHttpParse extends ActorRdfDereference implements
     const headers: Headers = new Headers();
     headers.append('Accept', acceptHeader);
     const httpAction: IActionHttp = { context: action.context, input: action.url, init: { headers } };
+    if (action.skipLocalCache) {
+      // An internal (non-standardized) option to indicate that no internal comunica HTTP caches should be used
+      (<any> httpAction.init).cache = 'no-local-store';
+    }
     const httpResponse: IActorHttpOutput = await this.mediatorHttp.mediate(httpAction);
 
     // Wrap WhatWG readable stream into a Node.js readable stream

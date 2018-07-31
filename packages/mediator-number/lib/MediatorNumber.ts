@@ -34,12 +34,12 @@ export class MediatorNumber<A extends Actor<I, T, O>, I extends IAction, T exten
     case MediatorNumber.MIN:
       return (tests: T[]) => <number> tests.reduce((a, b, i) => {
         const val: number = this.getOrDefault((<any> b)[this.field], Infinity);
-        return a[0] >= val ? [val, i] : a;
+        return val !== null && a[0] >= val ? [val, i] : a;
       }, [ Infinity, -1 ])[1];
     case MediatorNumber.MAX:
       return (tests: T[]) => <number> tests.reduce((a, b, i) => {
         const val: number = this.getOrDefault((<any> b)[this.field], -Infinity);
-        return a[0] <= val ? [val, i] : a;
+        return val !== null && a[0] <= val ? [val, i] : a;
       }, [ -Infinity, -1 ])[1];
     }
     throw new Error('No valid "type" value was given, must be either '
@@ -47,7 +47,7 @@ export class MediatorNumber<A extends Actor<I, T, O>, I extends IAction, T exten
   }
 
   protected getOrDefault(value: number | null, defaultValue: number): number {
-    return value === undefined || value === null ? defaultValue : value;
+    return value === undefined ? defaultValue : value;
   }
 
   protected async mediateWith(action: I, testResults: IActorReply<A, I, T, O>[]): Promise<A> {
