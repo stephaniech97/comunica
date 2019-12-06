@@ -16,17 +16,40 @@ export class ActorRdfJoinMultiSmallest extends ActorRdfJoin {
     super(args, 3, true);
   }
 
-  public static getSmallestPatternId(totalItems: number[]) {
-    let smallestId: number = -1;
-    let smallestCount: number = Infinity;
+  /**
+   * Get the n smallest pattern ids
+   * @param {number[]} totalItems An array of total item counts
+   * @param {number} count The number (n) of smallest patterns to look for.
+   * @return {number[]} An array (size count) of the smallest patterns.
+   */
+  public static getSmallestPatternIds(totalItems: number[], count: number): number[] {
+    // Initialize the array of smallest elements
+    const smallest = [];
+    for (let j = 0; j < count; ++j) {
+      smallest.push({ id: -1, count: Infinity });
+    }
+
+    // Iterate over all items once (O(n))
     for (let i = 0; i < totalItems.length; i++) {
-      const count: number = totalItems[i];
-      if (count <= smallestCount) {
-        smallestCount = count;
-        smallestId = i;
+      const countI: number = totalItems[i];
+      for (let k = count - 1; k >= 0; --k) {
+        // Insert new entry if it is smaller
+        if (countI < smallest[k].count) {
+          smallest[k].id = i;
+          smallest[k].count = countI;
+        }
+
+        // Stop if the next entry would be larger (or we reached the end)
+        if (countI >= smallest[k].count || k === 0) {
+          // Shift larger entries to the right
+          if (k < countI - 1) {
+            smallest[k + 1] = smallest[k];
+          }
+          break;
+        }
       }
     }
-    return smallestId;
+    return smallest.map((element) => element.id);
   }
 
   protected async getOutput(action: IActionRdfJoin): Promise<IActorQueryOperationOutputBindings> {
@@ -35,18 +58,24 @@ export class ActorRdfJoinMultiSmallest extends ActorRdfJoin {
     // Determine the two smallest streams by estimated count
     const entriesTotalItems = (await Promise.all(action.entries.map((entry) => entry.metadata())))
       .map((metadata) => 'totalItems' in metadata ? metadata.totalItems : Infinity);
-    const smallestIndex1: number = ActorRdfJoinMultiSmallest.getSmallestPatternId(entriesTotalItems);
-    const smallestItem1 = entries.splice(smallestIndex1, 1)[0];
-    const smallestCount1 = entriesTotalItems.splice(smallestIndex1, 1);
-    const smallestIndex2: number = ActorRdfJoinMultiSmallest.getSmallestPatternId(entriesTotalItems);
-    const smallestItem2 = entries.splice(smallestIndex2, 1)[0];
-    const smallestCount2 = entriesTotalItems.splice(smallestIndex2, 1);
+    const smallestPatternsIds = ActorRdfJoinMultiSmallest.getSmallestPatternIds(entriesTotalItems, 2);
+    const smallestPatterns: IActorQueryOperationOutputBindings[] = smallestPatternsIds
+      .map((patternId) => entries[patternId]);
+    console.log(smallestPatternsIds); // TODO
+
+    // Determine the remaining streams
+    const remainingPatterns: IActorQueryOperationOutputBindings[] = [];
+    for (let i = 0; i < entries.length; i++) {
+      if (smallestPatternsIds.indexOf(i) < 0) {
+        remainingPatterns.push(entries[i]);
+      }
+    }
 
     // Join the two selected streams, and then join the result with the remaining streams
     const firstEntry: IActorQueryOperationOutputBindings = <IActorQueryOperationOutputBindings> await
-      this.mediatorJoin.mediate({ entries: [ smallestItem1, smallestItem2 ] });
-    entries.push(firstEntry);
-    return <IActorQueryOperationOutputBindings> await this.mediatorJoin.mediate({ entries });
+      this.mediatorJoin.mediate({ entries: smallestPatterns });
+    remainingPatterns.push(firstEntry);
+    return <IActorQueryOperationOutputBindings> await this.mediatorJoin.mediate({ entries: remainingPatterns });
   }
 
   protected async getIterations(action: IActionRdfJoin): Promise<number> {
