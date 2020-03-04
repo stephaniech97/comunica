@@ -1,0 +1,34 @@
+<!-- Execute yarn run browser, run http-server from actor-init-sparql folder, and visit localhost:8080/bintest/index-perf.html -->
+<html>
+<head>
+    <title>Bla</title>
+</head>
+<body>
+<script src="../comunica-browser.js"></script>
+<script language="JavaScript">
+    const ITERATIONS = 10;
+    async function run() {
+      const query = `SELECT ?movie ?title ?name
+WHERE {
+  ?movie dbpedia-owl:starring [ rdfs:label "Brad Pitt"@en ];
+         rdfs:label ?title;
+         dbpedia-owl:director [ rdfs:label ?name ].
+  FILTER LANGMATCHES(LANG(?title), "EN")
+  FILTER LANGMATCHES(LANG(?name),  "EN")
+}`;
+      const myEngine = Comunica.newEngine();
+      console.time('duration');
+      for (let i = 0; i < ITERATIONS; i++) {
+        const result = await myEngine.query(query, {sources: ['http://fragments.dbpedia.org/2016-04/en']});
+        result.bindingsStream.on('data', (d) => {
+          // Ignore output
+        });
+        result.bindingsStream.on('error', () => console.error('a'));
+        await new Promise((resolve) => result.bindingsStream.on('end', resolve));
+      }
+      console.timeEnd('duration');
+    }
+    run();
+</script>
+</body>
+</html>
