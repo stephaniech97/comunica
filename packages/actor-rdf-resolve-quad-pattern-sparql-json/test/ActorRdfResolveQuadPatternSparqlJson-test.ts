@@ -95,6 +95,11 @@ describe('ActorRdfResolveQuadPatternSparqlJson', () => {
       return expect(ActorRdfResolveQuadPatternSparqlJson.patternToCountQuery(quad('?s', '?p', '?o')))
         .toEqual('SELECT (COUNT(*) AS ?count) WHERE { ?s ?p ?o. }');
     });
+
+    it('should convert a quad in the non-default graph with variables to a count query', () => {
+      return expect(ActorRdfResolveQuadPatternSparqlJson.patternToCountQuery(quad('?s', '?p', '?o', '?g')))
+        .toEqual('SELECT (COUNT(*) AS ?count) WHERE { GRAPH ?g { ?s ?p ?o. } }');
+    });
   });
 
   describe('An ActorRdfResolveQuadPatternSparqlJson instance', () => {
